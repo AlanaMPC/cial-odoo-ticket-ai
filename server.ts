@@ -466,74 +466,78 @@ function getHeuristicClassification(subject: string, body: string, sender: any) 
     };
   }
 
-  // Check 2: Casual greetings with no inquiry/airport context
-  const cleanText = `${subject} ${body}`.replace(/[^a-zA-Z0-9\s]/g, '').trim().toLowerCase();
-  const words = cleanText.split(/\s+/).filter(Boolean);
-  const isShortGreeting =
-    words.length <= 6 &&
-    (cleanText.includes('hi') ||
-      cleanText.includes('hii') ||
-      cleanText.includes('hiii') ||
-      cleanText.includes('hello') ||
-      cleanText.includes('hey') ||
-      cleanText.includes('greetings') ||
-      cleanText.includes('test') ||
-      cleanText.includes('testing') ||
-      cleanText.includes('good morning') ||
-      cleanText.includes('good afternoon') ||
-      cleanText.includes('good evening'));
+  // Check 2: Casual greetings, pleasantries, or thank-you notes with no active grievance
+  // Extract actual passenger text without synthetic gateway subject prefixes like "[WhatsApp] Cial (2 messages buffered)"
+  const rawPassengerText = (body || '').trim();
+  const rawCleanSubject = (subject || '').replace(/^\[(?:whatsapp|email|sms|inbound)\]\s*cial\s*(\(\d+\s*messages?\s*buffered\))?/gi, '').trim();
+  const passengerMessage = `${rawCleanSubject} ${rawPassengerText}`.trim().toLowerCase();
+  const passengerWords = passengerMessage.replace(/[^a-zA-Z0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
 
-  // Check if any airport keywords are present
-  const airportKeywords = [
-    'flight', 'airport', 'terminal', 'cial', 'cochin', 'koc', 'cok',
-    'bag', 'baggage', 'luggage', 'pnr', 'boarding', 'gate', 'carousel',
-    'belt', 'conveyor', 'washroom', 'toilet', 'leak', 'wheelchair', 'prm',
-    'buggy', 'assistance', 'ac', 'chiller', 'wifi', 'wi-fi', 'fids',
-    'lost', 'found', 'cisf', 'security', 'immigration', 'customs',
-    'indigo', 'air india', 'spicejet', 'emirates', 'etihad', 'qatar',
-    'airasia', 'scoot', 'gulf air', 'parking', 'taxi', 'duty free'
+  // Detect gratitude / pleasantries / conversation closers
+  const gratitudeRegex = /\b(thank\s*you|thanks|thank\s*u|thx|ok\s+thanks|appreciate\s+it|thank\s+you\s+for\s+the\s+help|thank\s+you\s+so\s+much|good\s+night|bye|have\s+a\s+good\s+day|welcome)\b/i;
+  const greetingRegex = /\b(hi|hii|hiii|hello|hey|namaskar|namaskaram|good\s+morning|good\s+afternoon|good\s+evening|test|testing)\b/i;
+
+  const isGratitude = gratitudeRegex.test(passengerMessage);
+  const isGreeting = greetingRegex.test(passengerMessage);
+
+  // Operational grievance & airport context keywords in passenger message
+  const grievanceKeywords = [
+    'bag', 'baggage', 'luggage', 'suitcase', 'trolley', 'lost', 'found', 'forgot', 'missing', 'left behind',
+    'leak', 'leaking', 'water', 'spill', 'dirty', 'washroom', 'toilet', 'clean', 'slip', 'slipping',
+    'wheelchair', 'prm', 'buggy', 'elderly', 'special assistance', 'escort', 'medical', 'stretcher',
+    'ac', 'a/c', 'cooling', 'chiller', 'hot', 'sweating', 'temperature', 'ventilation',
+    'gate', 'boarding', 'delay', 'delayed', 'cancelled', 'pnr', 'ticket', 'flight', 'airline',
+    'cisf', 'security', 'frisking', 'screening', 'queue', 'officer',
+    'carousel', 'conveyor', 'bhs', 'belt', 'jam',
+    'wifi', 'wi-fi', 'fids', 'flight display', 'screen', 'otp', 'network error',
+    'fod', 'runway', 'apron', 'bird', 'debris',
+    'overcharge', 'mrp', 'bill', 'shop', 'food court', 'restaurant', 'price'
   ];
 
-  const hasAirportKeyword = airportKeywords.some(kw => content.includes(kw));
+  const hasGrievanceKeyword = grievanceKeywords.some(kw => passengerMessage.includes(kw));
 
-  if (isShortGreeting && !hasAirportKeyword) {
+  // If the message is just a greeting, a thank-you note, or short conversation pleasantry without a grievance:
+  if ((isGratitude || isGreeting || passengerWords.length <= 6) && !hasGrievanceKeyword) {
     return {
       isAirportRelated: false,
       category: 'CASUAL_GREETING' as const,
-      rejectionReason: 'The email contains only a casual greeting or test message without any specific airport inquiry, flight number, grievance, or service request.',
-      ticketTitle: `[Casual Greeting] ${subject || 'Greetings'}`,
-      summary: `Casual greeting received from ${senderName} (${senderEmail || 'unknown'}). No operational grievance or airport request was specified.`,
+      rejectionReason: isGratitude
+        ? `The message is an expression of passenger gratitude / courtesy ("${rawPassengerText.replace(/\n/g, ' ')}") with no active operational issue or facility grievance.`
+        : `The message is a casual greeting or test message ("${rawPassengerText.replace(/\n/g, ' ')}") without any flight details, grievance, or service request.`,
+      ticketTitle: `[Filtered] ${isGratitude ? 'Passenger Courtesy / Thank You' : 'Casual Greeting'}`,
+      summary: `Passenger message from ${senderName} contains courtesy pleasantries without an operational grievance.`,
       terminal: 'NONE' as const,
       terminalLabel: 'Not Applicable',
-      specificLocation: 'Not Specified',
+      specificLocation: 'N/A',
       department: 'NONE' as const,
-      departmentLabel: 'Not Airport Related / Greeting',
+      departmentLabel: 'Not Airport Related / Courtesy',
       priority: 'P4_LOW' as const,
-      priorityLabel: 'Informational Only',
+      priorityLabel: 'No Action Required',
       slaMinutes: 0,
       actionRequired: [
-        'Flagged as casual greeting / non-complaint.',
-        'Do not dispatch as an airport operational ticket.',
-        'Optional: Send courteous Kerala hospitality greeting asking how CIAL can assist.'
+        isGratitude ? 'Acknowledge passenger courtesy.' : 'Send polite greeting asking how CIAL can assist.',
+        'Do not dispatch to Odoo Helpdesk ERP.'
       ],
-      suggestedAssignee: 'Customer Facilitation Desk',
-      suggestedTeamLead: 'Passenger Relations Lead',
+      suggestedAssignee: 'None',
+      suggestedTeamLead: 'AI Gateway Filter',
       passengerImpact: 'LOW' as const,
-      confidenceScore: 0.98,
-      reasoning: 'The sender sent an introductory greeting without mentioning any flight details, airport terminal, or operational issue.',
+      confidenceScore: 0.99,
+      reasoning: 'Extracted passenger text contains conversational pleasantries or gratitude without mentioning any baggage, flight disruption, terminal facility fault, or operational assistance request.',
       extractedEntities: {
         flightNumber: 'Not provided',
         pnr: 'Not provided',
         contactNumber: sender?.phone || 'Not provided',
-        assetInvolved: 'General Inquiry'
+        assetInvolved: 'Conversational Pleasantry'
       },
-      draftAutoReply: `Dear ${senderName},\n\nNamaskaram from Cochin International Airport (CIAL)!\n\nThank you for reaching out to us. We would be delighted to assist you. Could you please let us know how we may help you today with your upcoming flight, baggage, terminal facilities, or airport services?\n\nWarm regards,\nPassenger Relations & Facilitation Desk\nCochin International Airport Limited (CIAL)`,
+      draftAutoReply: isGratitude
+        ? `Dear ${senderName},\n\nNamaskaram from Cochin International Airport (CIAL)!\n\nYou are most welcome! We are always delighted to assist you. Wishing you a safe, smooth, and pleasant journey ahead from Cochin!\n\nWarm regards,\nPassenger Relations Desk\nCochin International Airport Limited (CIAL)`
+        : `Dear ${senderName},\n\nNamaskaram from Cochin International Airport (CIAL)!\n\nThank you for reaching out to us. How may we assist your upcoming flight or airport visit today? Please reply with your flight number or query so our team can help you.\n\nWarm regards,\nAirport Operations Control Centre (AOCC)\nCochin International Airport Limited (CIAL)`,
       odooPayload: null
     };
   }
 
   // Check 3: Check for general irrelevant text / spam
-  if (!hasAirportKeyword && words.length < 15) {
+  if (!hasGrievanceKeyword && passengerWords.length < 15) {
     return {
       isAirportRelated: false,
       category: 'INSUFFICIENT_INFO' as const,
@@ -692,7 +696,15 @@ function getHeuristicClassification(subject: string, body: string, sender: any) 
     priority = 'P1_CRITICAL';
     priorityLabel = 'P1 - Critical (15-min SLA)';
     slaMinutes = 15;
-  } else if (content.includes('wifi') || content.includes('wi-fi') || content.includes('otp') || content.includes('fids') || content.includes('network') || content.includes('app') || content.includes('screen')) {
+  } else if (
+    passengerMessage.includes('wifi') ||
+    passengerMessage.includes('wi-fi') ||
+    passengerMessage.includes('otp') ||
+    passengerMessage.includes('fids') ||
+    passengerMessage.includes('flight display') ||
+    passengerMessage.includes('screen error') ||
+    /\b(cial\s+app|mobile\s+app|app\s+crash|network\s+down|telecom)\b/i.test(passengerMessage)
+  ) {
     department = 'IT_FIDS_TELECOM';
     departmentLabel = 'Airport IT, FIDS & Telecom';
     suggestedAssignee = 'Systems Engineer - Airport Network Ops';
@@ -813,23 +825,23 @@ Before creating any airport ticket, determine if this email is genuinely an inqu
 
 Classify into one of these exact categories:
 1. "AIRPORT_OPERATIONAL": Legitimate CIAL passenger grievance, baggage issue, flight delay query, terminal facility issue, PRM assistance, lost & found, CISF security, or ground operation.
-2. "CASUAL_GREETING": Casual greetings or test messages (e.g., "Hi", "Hello", "Greetings", "Testing", "Good morning") with NO specific airport grievance, flight detail, or actionable request.
+2. "CASUAL_GREETING": Casual greetings, test messages, pleasantries, or passenger gratitude / thank-you notes (e.g., "Hi", "Hello", "Greetings", "Thank you for the help", "Thanks", "Ok thanks", "Good morning") with NO specific active airport grievance, flight details, or operational breakdown.
 3. "AUTOMATED_SYSTEM_NOTICE": Automated emails from external services (e.g., Google Security Alerts, "2-Step Verification turned on", password reset notices, verification codes, system bounces, no-reply alerts).
 4. "SPAM_OR_IRRELEVANT": Advertising, sales pitches, marketing, unrelated personal chatter, or messages having nothing to do with Cochin Airport.
 5. "INSUFFICIENT_INFO": Vague, corrupted, or one-word text devoid of any context to take operational action.
 
-CRITICAL INSTRUCTIONS FOR NON-AIRPORT EMAILS:
+CRITICAL INSTRUCTIONS FOR NON-AIRPORT EMAILS & CASUAL GREETINGS / THANK YOUS:
 If the email is NOT "AIRPORT_OPERATIONAL":
 - Set "isAirportRelated": false
 - DO NOT hallucinate airport terminals, boarding gates, or maintenance tasks!
-- Clearly state "rejectionReason" explaining why this was flagged (e.g., "This email is an automated Google Security notification ('2-Step Verification') and not an airport operations inquiry" or "This email is a casual greeting ('Hiii') with no flight or airport context").
+- Clearly state "rejectionReason" explaining why this was flagged (e.g., "This message is a passenger courtesy note ('Thank you for the help') with no active operational issue or flight complaint to dispatch" or "This email is an automated Google Security notification").
 - Set "ticketTitle": "[Filtered] " followed by original subject.
 - Set "terminal": "NONE", "terminalLabel": "Not Applicable", "specificLocation": "N/A".
-- Set "department": "NONE", "departmentLabel": "Not Airport Related / Filtered".
+- Set "department": "NONE", "departmentLabel": "Not Airport Related / Courtesy".
 - Set "priority": "P4_LOW", "priorityLabel": "No Action Required", "slaMinutes": 0.
-- Set "actionRequired": ["Email filtered by AI Gateway as non-operational / spam / automated notification.", "Do not dispatch to Odoo Helpdesk."].
+- Set "actionRequired": ["Email filtered by AI Gateway as passenger courtesy / greeting / non-operational.", "Do not dispatch to Odoo Helpdesk."].
 - Set "draftAutoReply": 
-  - For casual greeting: A polite greeting asking how CIAL can assist their flight or airport journey.
+  - For casual greeting or thank-you: A warm, polite Kerala hospitality acknowledgment ("Namaskaram! You are most welcome...") wishing them a safe and pleasant journey from Cochin.
   - For automated notices or spam: "Automated notification detected. No reply needed."
 
 CRITICAL INSTRUCTIONS FOR LEGITIMATE AIRPORT EMAILS:
@@ -875,8 +887,8 @@ ${email.body}
 Return a strictly valid JSON object matching the requested schema.`;
 
         let response: any = null;
-        let usedModel = 'gemini-3.8-flash';
-        const candidateModels = ['gemini-3.8-flash', 'gemini-flash-latest', 'gemini-3.1-flash-lite'];
+        let usedModel = 'gemini-3.1-flash-lite';
+        const candidateModels = ['gemini-3.1-flash-lite', 'gemini-2.5-flash', 'gemini-3.8-flash'];
 
         for (const modelName of candidateModels) {
           try {
