@@ -1,0 +1,9 @@
+{
+  "user": "cial.test.odoo@gmail.com",
+  "pass": "pehsftknwugbeimp",
+  "host": "imap.gmail.com",
+  "port": 993,
+  "secure": true,
+  "autoSync": true,
+  "fetchUnreadOnly": true
+}

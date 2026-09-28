@@ -1,0 +1,6 @@
+{
+  "name": "CIAL AI Airport Dispatch & Odoo Helpdesk Engine",
+  "description": "AI-powered email comprehension and automated Odoo ticket dispatch system for Cochin International Airport Limited (CIAL).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
