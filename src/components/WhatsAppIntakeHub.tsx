@@ -539,15 +539,6 @@ export const WhatsAppIntakeHub: React.FC<WhatsAppIntakeHubProps> = ({
                       </button>
 
                       <button
-                        onClick={() => handleDispatchSingleSession(session)}
-                        title="Immediately triage and create ticket in Odoo ERP"
-                        className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1 transition cursor-pointer shadow-sm"
-                      >
-                        <Play className="w-3 h-3 fill-white" />
-                        <span className="hidden sm:inline">Quick Triage</span>
-                      </button>
-
-                      <button
                         onClick={(e) => handleDeleteSession(session.id, e)}
                         title="Delete this WhatsApp session"
                         className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
