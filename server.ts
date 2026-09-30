@@ -411,7 +411,7 @@ function getHeuristicClassification(subject: string, body: string, sender: any) 
   const senderEmail = (sender?.email || '').toLowerCase();
   const senderName = sender?.name || 'Sender';
 
-  // Check 1: Automated notification from Google, system accounts, or no-reply
+  // Check 1: Automated notification from Google, system accounts, SaaS platforms (Odoo, GitHub, AWS, etc.), or no-reply
   const isAutomatedSender =
     senderEmail.includes('no-reply') ||
     senderEmail.includes('noreply') ||
@@ -419,24 +419,43 @@ function getHeuristicClassification(subject: string, body: string, sender: any) 
     senderEmail.includes('accounts.google.com') ||
     senderEmail.includes('notifications@') ||
     senderEmail.includes('mailer-daemon') ||
-    senderEmail.includes('security@');
+    senderEmail.includes('security@') ||
+    senderEmail.includes('odoo.com') ||
+    senderEmail.includes('github.com') ||
+    senderEmail.includes('aws.amazon.com') ||
+    senderEmail.includes('twilio.com') ||
+    senderEmail.includes('stripe.com') ||
+    senderEmail.includes('billing@') ||
+    senderEmail.includes('newsletter') ||
+    senderEmail.includes('marketing@');
 
-  const isGoogleSecurityNotice =
+  const isAutomatedSystemNotice =
     content.includes('2-step verification') ||
     content.includes('security alert') ||
     content.includes('verification code') ||
     content.includes('password reset') ||
     content.includes('sign-in attempt') ||
     content.includes('google account') ||
-    content.includes('new login');
+    content.includes('new login') ||
+    content.includes('activate your database') ||
+    content.includes('database confirmation') ||
+    content.includes('has been created') ||
+    content.includes('click the link below') ||
+    content.includes('schedule a call with an expert') ||
+    content.includes('verify your email') ||
+    content.includes('confirm your email') ||
+    content.includes('unsubscribe') ||
+    content.includes('receipt for your payment') ||
+    content.includes('invoice') ||
+    content.includes('terms of service update');
 
-  if (isAutomatedSender || isGoogleSecurityNotice) {
+  if (isAutomatedSender || isAutomatedSystemNotice) {
     return {
       isAirportRelated: false,
       category: 'AUTOMATED_SYSTEM_NOTICE' as const,
-      rejectionReason: 'Automated third-party system notice (e.g. Google security alert / 2-Step Verification). Not related to CIAL airport operations.',
-      ticketTitle: `[Automated Notice] ${subject || 'System Notification'}`,
-      summary: `Automated security/system alert received from ${senderEmail || 'external provider'}. This is not related to Cochin International Airport operations.`,
+      rejectionReason: 'Automated third-party system notice (e.g. software/SaaS notification, account confirmation, security alert). Not related to CIAL airport passenger or terminal operations.',
+      ticketTitle: `[Filtered / Automated Notice] ${subject || 'System Notification'}`,
+      summary: `Automated third-party system notification received from ${senderEmail || 'external provider'}. This is not related to Cochin International Airport passenger operations.`,
       terminal: 'NONE' as const,
       terminalLabel: 'Not Applicable',
       specificLocation: 'External (Non-Airport)',
@@ -454,12 +473,12 @@ function getHeuristicClassification(subject: string, body: string, sender: any) 
       suggestedTeamLead: 'AI Gateway Filter',
       passengerImpact: 'LOW' as const,
       confidenceScore: 0.99,
-      reasoning: 'Sender or message contents correspond to automated IT/Google security notices without any operational CIAL passenger or ground request.',
+      reasoning: 'Sender or message contents correspond to automated IT/SaaS account notifications without any operational CIAL passenger or ground request.',
       extractedEntities: {
         flightNumber: 'None',
         pnr: 'None',
         contactNumber: 'None',
-        assetInvolved: 'External Email Provider'
+        assetInvolved: 'External Software Notification'
       },
       draftAutoReply: 'No automated reply sent (Automated system notice / no-reply address).',
       odooPayload: null
@@ -536,38 +555,54 @@ function getHeuristicClassification(subject: string, body: string, sender: any) 
     };
   }
 
-  // Check 3: Check for general irrelevant text / spam
-  if (!hasGrievanceKeyword && passengerWords.length < 15) {
+  // Check 3: Strict Airport & Aviation Relevance Check
+  // An email MUST contain aviation, airline, passenger, or airport facility context to be an airport operational ticket
+  const airportContextKeywords = [
+    'flight', 'airline', 'airport', 'terminal', 'cial', 'cochin', 'nedumbassery', 'cok', 'voci',
+    'pnr', 'boarding', 'gate', 'indigo', 'air india', 'emirates', 'etihad', 'qatar', 'spicejet',
+    'airasia', 'akasa', 'flydubai', 'gulf air', 'singapore airlines', 'saudia', 'oman air', 'srilankan',
+    'aircraft', 'aerodrome', 'airside', 'concourse', 'arrival', 'departure', 'transit', 'check-in',
+    'security check', 'cisf', 'customs', 'immigration', 'visa', 'passport',
+    'bag', 'baggage', 'luggage', 'suitcase', 'trolley', 'carousel', 'conveyor', 'lost & found',
+    'washroom', 'toilet', 'restroom', 'leak', 'wheelchair', 'prm', 'buggy', 'assistance',
+    'air conditioning', 'chiller', 'cooling', 'wifi', 'wi-fi', 'fids', 'parking', 'taxi', 'duty free'
+  ];
+
+  const hasAirportContext = airportContextKeywords.some(kw => content.includes(kw));
+
+  // If there are NO airport context keywords and NO operational grievance keywords, REJECT immediately!
+  if (!hasAirportContext && !hasGrievanceKeyword) {
     return {
       isAirportRelated: false,
-      category: 'INSUFFICIENT_INFO' as const,
-      rejectionReason: 'The email does not contain any references to Cochin International Airport, flights, passenger services, or airport facilities, and has insufficient context to create a ticket.',
-      ticketTitle: `[Non-Airport / Insufficient Context] ${subject || 'Message'}`,
-      summary: `Inbound message from ${senderName} lacks airport context or actionable passenger details.`,
+      category: 'SPAM_OR_IRRELEVANT' as const,
+      rejectionReason: 'The email does not contain any references to Cochin International Airport (CIAL), flights, airlines, passenger services, or terminal facilities. Filtered by AI Triage Gateway.',
+      ticketTitle: `[Filtered / Non-Airport] ${subject || 'Unrelated Inquiry'}`,
+      summary: `Inbound communication from ${senderName} (${senderEmail || 'unknown'}) is unrelated to Cochin International Airport operations.`,
       terminal: 'NONE' as const,
       terminalLabel: 'Not Applicable',
-      specificLocation: 'Unknown',
+      specificLocation: 'N/A',
       department: 'NONE' as const,
-      departmentLabel: 'Not Airport Related',
+      departmentLabel: 'Not Airport Related / Filtered',
       priority: 'P4_LOW' as const,
       priorityLabel: 'No Action Required',
       slaMinutes: 0,
       actionRequired: [
-        'Flagged as non-airport related message.',
-        'Do not dispatch to Odoo Helpdesk ERP.'
+        'Flagged as non-airport message by CIAL Triage Gateway.',
+        'Do not dispatch to Odoo Helpdesk ERP.',
+        'No ground task required.'
       ],
-      suggestedAssignee: 'None',
+      suggestedAssignee: 'None (Filtered)',
       suggestedTeamLead: 'AI Gateway Filter',
       passengerImpact: 'LOW' as const,
-      confidenceScore: 0.92,
-      reasoning: 'No aviation, terminal, or passenger facilities keywords found in the message.',
+      confidenceScore: 0.99,
+      reasoning: 'Zero airport, flight, passenger facilitation, or terminal infrastructure keywords identified in the email body or subject.',
       extractedEntities: {
         flightNumber: 'None',
         pnr: 'None',
         contactNumber: sender?.phone || 'None',
-        assetInvolved: 'None'
+        assetInvolved: 'Non-Airport Email'
       },
-      draftAutoReply: `Dear ${senderName},\n\nThank you for contacting Cochin International Airport Limited (CIAL).\n\nIf you have an inquiry or grievance regarding your flight, baggage, parking, or terminal services at CIAL (COK), please reply with your flight number, date of travel, or specific issue so our team can assist you.\n\nWarm regards,\nAirport Operations Control Centre (AOCC)\nCochin International Airport Limited`,
+      draftAutoReply: `Dear ${senderName},\n\nThank you for reaching out to Cochin International Airport Limited (CIAL).\n\nOur system detected that your email does not mention an airport operational issue, flight number, or passenger assistance request. If you require assistance regarding Cochin Airport (COK), please reply with your flight number, date of travel, or specific terminal query.\n\nWarm regards,\nAirport Operations Control Centre (AOCC)\nCochin International Airport Limited`,
       odooPayload: null
     };
   }
