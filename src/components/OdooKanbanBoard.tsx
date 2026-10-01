@@ -85,33 +85,33 @@ export const OdooKanbanBoard: React.FC<OdooKanbanBoardProps> = ({
     <div className="space-y-5">
       
       {/* Odoo Styled Breadcrumb & Controls Header */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
+      <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center shadow-2xs">
-              <Building2 className="w-5 h-5 text-blue-600" />
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center shadow-2xs shrink-0">
+              <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
             </div>
-            <div>
-              <div className="flex items-center gap-1.5 text-xs text-slate-400 font-semibold">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-slate-400 font-semibold truncate">
                 <span>Odoo ERP v17</span>
                 <span>/</span>
                 <span className="text-slate-600">Helpdesk &amp; Field Services</span>
                 <span>/</span>
                 <span className="text-blue-600 font-bold">CIAL Operations Desk</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+              <h2 className="text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight">
                 Airport Tickets &amp; Task Dispatches
               </h2>
             </div>
           </div>
 
           {/* View Mode & New Ticket Button */}
-          <div className="flex items-center gap-2.5 flex-wrap">
+          <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
             <a
               href="https://cial1.odoo.com/odoo/helpdesk/1/tickets"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3.5 py-1.5 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-xs flex items-center gap-1.5 transition shadow-2xs cursor-pointer"
+              className="px-3 py-1.5 rounded-xl sm:rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-xs flex items-center gap-1.5 transition shadow-2xs cursor-pointer"
               title="Open your real live Odoo Helpdesk dashboard in a new tab"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -119,10 +119,10 @@ export const OdooKanbanBoard: React.FC<OdooKanbanBoardProps> = ({
               <ExternalLink className="w-3.5 h-3.5 text-emerald-700" />
             </a>
 
-            <div className="bg-slate-100 border border-slate-200 p-1 rounded-2xl flex items-center gap-1">
+            <div className="bg-slate-100 border border-slate-200 p-1 rounded-xl sm:rounded-2xl flex items-center gap-1">
               <button
                 onClick={() => setViewMode('kanban')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg sm:rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                   viewMode === 'kanban'
                     ? 'bg-white text-slate-900 shadow-xs'
                     : 'text-slate-500 hover:text-slate-900'
@@ -134,7 +134,7 @@ export const OdooKanbanBoard: React.FC<OdooKanbanBoardProps> = ({
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg sm:rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                   viewMode === 'list'
                     ? 'bg-white text-slate-900 shadow-xs'
                     : 'text-slate-500 hover:text-slate-900'
@@ -151,16 +151,16 @@ export const OdooKanbanBoard: React.FC<OdooKanbanBoardProps> = ({
                 onClick={onClearTickets}
                 disabled={tickets.length === 0}
                 title="Clear all tickets on this board"
-                className="px-3 py-2 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200 flex items-center gap-1.5 transition cursor-pointer disabled:opacity-40"
+                className="px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200 flex items-center gap-1.5 transition cursor-pointer disabled:opacity-40"
               >
                 <Trash2 className="w-3.5 h-3.5 text-rose-600" />
-                <span>Clear Board</span>
+                <span className="hidden sm:inline">Clear Board</span>
               </button>
             )}
 
             <button
               onClick={onOpenNewAnalyzer}
-              className="px-4 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-blue-500/25 transition cursor-pointer"
+              className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-blue-500/25 transition cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Dispatch Inbound Email</span>
@@ -261,7 +261,7 @@ export const OdooKanbanBoard: React.FC<OdooKanbanBoardProps> = ({
 
       {/* VIEW 1: KANBAN BOARD */}
       {viewMode === 'kanban' && filteredTickets.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto pb-4">
+        <div className="flex xl:grid xl:grid-cols-5 gap-3 sm:gap-4 overflow-x-auto pb-4 scroll-smooth snap-x snap-mandatory touch-pan-x no-scrollbar">
           {stages.map((stage) => {
             const stageTickets = filteredTickets.filter((t) => {
               if (stage.id === 'DISPATCHED_TO_ODOO') {
@@ -273,10 +273,10 @@ export const OdooKanbanBoard: React.FC<OdooKanbanBoardProps> = ({
             return (
               <div
                 key={stage.id}
-                className="bg-slate-100/70 border border-slate-200/90 rounded-3xl p-4 min-w-[260px] flex flex-col justify-between shadow-2xs"
+                className="w-[85vw] max-w-[340px] sm:w-[300px] xl:w-auto xl:max-w-none shrink-0 xl:shrink bg-slate-100/70 border border-slate-200/90 rounded-2xl sm:rounded-3xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs snap-center"
               >
                 {/* Column Header */}
-                <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200/80">
+                <div className="flex items-center justify-between pb-2.5 sm:pb-3 mb-2.5 sm:mb-3 border-b border-slate-200/80">
                   <div>
                     <span className="font-bold text-xs text-slate-800 block">
                       {stage.label}

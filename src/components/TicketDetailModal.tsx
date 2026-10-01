@@ -59,18 +59,18 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-2 sm:p-6 overflow-y-auto">
+      <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh] sm:max-h-[90vh]">
         
         {/* Top Header */}
-        <div className="p-5 bg-white border-b border-slate-100 flex items-start justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono text-sm font-extrabold text-blue-600">
+        <div className="p-3.5 sm:p-5 bg-white border-b border-slate-100 flex items-start justify-between gap-3 sm:gap-4">
+          <div className="space-y-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <span className="font-mono text-xs sm:text-sm font-extrabold text-blue-600">
                 {ticket.odooTicketId || 'PENDING-DISPATCH'}
               </span>
               <span
-                className={`text-[10px] px-2.5 py-0.5 rounded-lg font-bold border ${
+                className={`text-[10px] px-2 sm:px-2.5 py-0.5 rounded-lg font-bold border ${
                   ticket.aiAnalysis.priority === 'P1_CRITICAL'
                     ? 'bg-rose-50 text-rose-700 border-rose-200'
                     : ticket.aiAnalysis.priority === 'P2_HIGH'
@@ -80,25 +80,25 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
               >
                 {ticket.aiAnalysis.priorityLabel}
               </span>
-              <span className="text-[10px] px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 font-bold">
+              <span className="text-[10px] px-2 sm:px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 font-bold">
                 {ticket.aiAnalysis.terminalLabel}
               </span>
             </div>
-            <h3 className="text-lg font-extrabold text-slate-900 tracking-tight">
+            <h3 className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight break-words">
               {ticket.aiAnalysis.ticketTitle}
             </h3>
           </div>
 
           <button
             onClick={onClose}
-            className="p-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-xl sm:rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition cursor-pointer shrink-0"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 
         {/* Status Lifecycle Stepper */}
-        <div className="bg-slate-50/80 px-5 py-3 border-b border-slate-100 flex items-center justify-between overflow-x-auto text-xs">
+        <div className="bg-slate-50/80 px-3 sm:px-5 py-2 sm:py-3 border-b border-slate-100 flex items-center justify-between overflow-x-auto text-xs no-scrollbar">
           <span className="text-slate-400 text-[11px] font-bold uppercase tracking-wider shrink-0 mr-3">STAGE:</span>
           <div className="flex items-center gap-1.5">
             {statusOptions.map((opt) => {
@@ -169,7 +169,7 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 overflow-y-auto space-y-4 text-xs flex-1">
+        <div className="p-3.5 sm:p-6 overflow-y-auto space-y-4 text-xs flex-1">
           
           {/* TAB 1: OVERVIEW */}
           {activeSubTab === 'overview' && (

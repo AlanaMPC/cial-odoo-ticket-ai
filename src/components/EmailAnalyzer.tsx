@@ -438,26 +438,26 @@ export const EmailAnalyzer: React.FC<EmailAnalyzerProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Bento Intro Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
         {/* Main Hero Bento Tile */}
-        <div className="lg:col-span-8 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+        <div className="lg:col-span-8 bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
               <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200">
                 Phase 1 &amp; 2 Prototype Engine
               </span>
               <span className="text-xs text-slate-500 font-mono font-medium">CIAL Cochin International Airport</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            <h1 className="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               Inbound Email AI Dispatcher &amp; Odoo Ticket Generator
             </h1>
-            <p className="text-slate-600 text-sm mt-2 max-w-3xl leading-relaxed">
+            <p className="text-slate-600 text-xs sm:text-sm mt-2 max-w-3xl leading-relaxed">
               Demonstrates how Gemini AI processes raw passenger grievances and airport staff emails, extracts terminal zones, assigns responsible departments, calculates SLA priorities, and creates structured Odoo Helpdesk tickets.
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-4 mt-4 border-t border-slate-100 gap-2">
-            <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-semibold text-slate-500">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 text-xs font-semibold text-slate-500">
               <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-500 shrink-0"></span> NLP Entity Extraction</span>
               <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span> XML-RPC / JSON-RPC</span>
               <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0"></span> Passenger Auto-Reply</span>
@@ -470,13 +470,13 @@ export const EmailAnalyzer: React.FC<EmailAnalyzerProps> = ({
 
         {/* Quick Bento Stats Tile */}
         <div className="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
-          <div className="bg-indigo-600 text-white rounded-3xl p-5 shadow-sm flex flex-col justify-between">
+          <div className="bg-indigo-600 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-sm flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-indigo-200">AI Confidence</span>
               <Sparkles className="w-4 h-4 text-indigo-200" />
             </div>
             <div className="my-2">
-              <div className="text-3xl font-extrabold">98.4%</div>
+              <div className="text-2xl sm:text-3xl font-extrabold">98.4%</div>
               <div className="text-xs text-indigo-100 mt-0.5">Average CIAL Department Routing Accuracy</div>
             </div>
             <div className="w-full bg-indigo-800/60 rounded-full h-1.5 overflow-hidden">
@@ -691,10 +691,10 @@ export const EmailAnalyzer: React.FC<EmailAnalyzerProps> = ({
       </div>
 
       {/* 2-Column Grid: Left (Received Email Inspector), Right (AI Output & Odoo Dispatch) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
         
         {/* Left Column: Received Email Viewer */}
-        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
+        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div className="flex items-center gap-2 text-slate-800 font-bold text-sm">
               {subject?.toLowerCase().includes('[whatsapp]') || selectedInboundEmailId?.startsWith('wa-') ? (
@@ -821,7 +821,7 @@ export const EmailAnalyzer: React.FC<EmailAnalyzerProps> = ({
         </div>
 
         {/* Right Column: AI Extraction & Odoo Dispatch View */}
-        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm min-h-[560px] flex flex-col justify-between">
+        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm min-h-[560px] flex flex-col justify-between">
           
           {/* Header */}
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">

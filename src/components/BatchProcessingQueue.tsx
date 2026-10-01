@@ -384,30 +384,30 @@ export const BatchProcessingQueue: React.FC<BatchProcessingQueueProps> = ({
     <div className="space-y-6">
       
       {/* Header Bar */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
             <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200 flex items-center gap-1.5">
               <Zap className="w-3 h-3 text-blue-600" />
               Real-Time Inbound Mail Intake
             </span>
             <span className="text-xs text-slate-500 font-mono font-medium">CIAL Airport Operations Center (AOCC)</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h2 className="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Inbound Airport Email &amp; Mailbox Hub
           </h2>
-          <p className="text-slate-600 text-sm mt-1 max-w-2xl leading-relaxed">
+          <p className="text-slate-600 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
             Real-time mailbox queue receiving passenger grievances and airline notices. When an email is triaged, it is dispatched to Odoo ERP and automatically transitioned to the Dispatched archive.
           </p>
 
           {hasSavedImap ? (
-            <div className="flex flex-wrap items-center gap-2 mt-3 px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium w-fit">
+            <div className="flex flex-wrap items-center gap-2 mt-3 px-3 sm:px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium w-fit">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
               <span className="font-bold">Live Mailbox:</span>
-              <span>Connected to <code className="font-mono font-bold text-emerald-900 bg-emerald-100/70 px-1.5 py-0.5 rounded">{imapConfig.user}</code></span>
+              <span className="truncate max-w-[200px] sm:max-w-none">Connected to <code className="font-mono font-bold text-emerald-900 bg-emerald-100/70 px-1.5 py-0.5 rounded">{imapConfig.user}</code></span>
               <span className="text-emerald-300">|</span>
               <button
                 type="button"
@@ -429,28 +429,28 @@ export const BatchProcessingQueue: React.FC<BatchProcessingQueueProps> = ({
             </div>
           ) : (
             <div className="flex items-center gap-2 mt-3 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium w-fit">
-              <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
               <span>No live email account connected. Click <strong>Connect Real Mailbox</strong> to link your Gmail or Outlook.</span>
             </div>
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
           {hasSavedImap && (
             <button
               onClick={handleQuickSync}
               disabled={isSyncingImap}
               title={`Fetch new incoming unread emails from ${imapConfig.user}`}
-              className="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-md shadow-indigo-500/25 disabled:opacity-50"
+              className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-md shadow-indigo-500/25 disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${isSyncingImap ? 'animate-spin text-white' : 'text-indigo-200'}`} />
-              <span>{isSyncingImap ? 'Checking Mailbox...' : 'Sync Mailbox (Fetch Latest)'}</span>
+              <span>{isSyncingImap ? 'Checking...' : 'Sync Mailbox'}</span>
             </button>
           )}
 
           <button
             onClick={() => setShowImapModal(true)}
-            className="px-4 py-2.5 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+            className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
           >
             <Globe className="w-4 h-4 text-indigo-600" />
             <span>{hasSavedImap ? 'Mailbox Settings' : 'Connect Real Mailbox'}</span>
@@ -460,7 +460,7 @@ export const BatchProcessingQueue: React.FC<BatchProcessingQueueProps> = ({
             id="process-all-queue-btn"
             onClick={processAllUnprocessed}
             disabled={isBatchRunning || unprocessedEmails.length === 0}
-            className="px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md shadow-blue-500/25 flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md shadow-blue-500/25 flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isBatchRunning ? (
               <>
@@ -470,12 +470,12 @@ export const BatchProcessingQueue: React.FC<BatchProcessingQueueProps> = ({
             ) : unprocessedEmails.length === 0 ? (
               <>
                 <Check className="w-4 h-4 text-white" />
-                <span>All Inbound Emails Dispatched</span>
+                <span>All Dispatched</span>
               </>
             ) : (
               <>
                 <Play className="w-4 h-4 text-white fill-white" />
-                <span>Auto-Triage All ({unprocessedEmails.length} Pending)</span>
+                <span>Auto-Triage All ({unprocessedEmails.length})</span>
               </>
             )}
           </button>
@@ -483,38 +483,38 @@ export const BatchProcessingQueue: React.FC<BatchProcessingQueueProps> = ({
       </div>
 
       {/* Bento Stats Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
-          <div className="text-slate-400 text-xs font-bold uppercase tracking-wider">AWAITING AI TRIAGE</div>
-          <div className="text-3xl font-extrabold text-amber-600 mt-1">{unprocessedEmails.length}</div>
-          <div className="text-[11px] text-slate-500 mt-1 font-medium">Pending tickets to be created</div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-sm">
+          <div className="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider">AWAITING AI TRIAGE</div>
+          <div className="text-2xl sm:text-3xl font-extrabold text-amber-600 mt-1">{unprocessedEmails.length}</div>
+          <div className="text-[10px] sm:text-[11px] text-slate-500 mt-1 font-medium">Pending tickets to be created</div>
         </div>
 
-        <div className="bg-blue-600 text-white rounded-3xl p-5 shadow-sm flex flex-col justify-between">
+        <div className="bg-blue-600 text-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="text-blue-200 text-xs font-bold uppercase tracking-wider">DISPATCHED TO ODOO</div>
-            <div className="text-3xl font-extrabold mt-1">{dispatchedEmails.length}</div>
+            <div className="text-blue-200 text-[10px] sm:text-xs font-bold uppercase tracking-wider">DISPATCHED TO ODOO</div>
+            <div className="text-2xl sm:text-3xl font-extrabold mt-1">{dispatchedEmails.length}</div>
           </div>
-          <div className="text-[11px] text-blue-100 mt-1 font-medium">Synced into Odoo Helpdesk ERP</div>
+          <div className="text-[10px] sm:text-[11px] text-blue-100 mt-1 font-medium">Synced into Odoo Helpdesk ERP</div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
-          <div className="text-slate-400 text-xs font-bold uppercase tracking-wider">TOTAL INGESTED</div>
-          <div className="text-3xl font-extrabold text-slate-900 mt-1">{emails.length}</div>
-          <div className="text-[11px] text-slate-500 mt-1 font-medium">Grievance &amp; Ops mailboxes</div>
+        <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-sm">
+          <div className="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider">TOTAL INGESTED</div>
+          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{emails.length}</div>
+          <div className="text-[10px] sm:text-[11px] text-slate-500 mt-1 font-medium">Grievance &amp; Ops mailboxes</div>
         </div>
 
-        <div className="bg-indigo-600 text-white rounded-3xl p-5 shadow-sm flex flex-col justify-between">
+        <div className="bg-indigo-600 text-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="text-indigo-200 text-xs font-bold uppercase tracking-wider">AUTOMATION RATE</div>
-            <div className="text-3xl font-extrabold mt-1">100%</div>
+            <div className="text-indigo-200 text-[10px] sm:text-xs font-bold uppercase tracking-wider">AUTOMATION RATE</div>
+            <div className="text-2xl sm:text-3xl font-extrabold mt-1">100%</div>
           </div>
-          <div className="text-[11px] text-indigo-100 mt-1 font-medium">Zero manual ticket entry</div>
+          <div className="text-[10px] sm:text-[11px] text-indigo-100 mt-1 font-medium">Zero manual ticket entry</div>
         </div>
       </div>
 
       {/* Mailbox Sub-Tab Switcher */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm overflow-hidden">
         
         <div className="pb-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           

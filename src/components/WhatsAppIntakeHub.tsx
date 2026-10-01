@@ -237,23 +237,23 @@ export const WhatsAppIntakeHub: React.FC<WhatsAppIntakeHubProps> = ({
   return (
     <div className="space-y-6">
       {/* Header Bar */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
             <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 flex items-center gap-1.5">
               <MessageSquare className="w-3 h-3 text-emerald-600" />
               Live WhatsApp Grievance Intake
             </span>
             <span className="text-xs text-slate-500 font-mono font-medium">15-Min Inactivity Aggregation Buffer</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h2 className="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             CIAL Airport WhatsApp Grievance Hub
           </h2>
-          <p className="text-slate-600 text-sm mt-1 max-w-2xl leading-relaxed">
+          <p className="text-slate-600 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
             Real passenger helpline. Receives real-time inbound WhatsApp messages, buffers sentence-by-sentence streams over a 15-minute window into unified complaints, and dispatches them to Odoo Helpdesk.
           </p>
 
-          <div className="flex flex-wrap items-center gap-2 mt-3 px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium w-fit">
+          <div className="flex flex-wrap items-center gap-2 mt-3 px-3 sm:px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium w-fit">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -286,20 +286,20 @@ export const WhatsAppIntakeHub: React.FC<WhatsAppIntakeHubProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
           <button
             onClick={() => setShowConfigModal(true)}
-            className="px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-md shadow-emerald-500/25"
+            className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-md shadow-emerald-500/25"
           >
             <Phone className="w-4 h-4 text-white" />
-            <span>Connect Real WhatsApp Number</span>
+            <span>Connect Real WhatsApp</span>
           </button>
 
           <button
             id="process-all-whatsapp-btn"
             onClick={handleAutoTriageAll}
             disabled={isBatchRunning || unprocessedSessions.length === 0}
-            className="px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md shadow-blue-500/25 flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md shadow-blue-500/25 flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isBatchRunning ? (
               <>
@@ -309,12 +309,12 @@ export const WhatsAppIntakeHub: React.FC<WhatsAppIntakeHubProps> = ({
             ) : unprocessedSessions.length === 0 ? (
               <>
                 <Check className="w-4 h-4 text-white" />
-                <span>All Grievances Dispatched</span>
+                <span>All Dispatched</span>
               </>
             ) : (
               <>
                 <Play className="w-4 h-4 text-white fill-white" />
-                <span>Auto-Triage All ({unprocessedSessions.length} Pending)</span>
+                <span>Auto-Triage All ({unprocessedSessions.length})</span>
               </>
             )}
           </button>
@@ -322,38 +322,38 @@ export const WhatsAppIntakeHub: React.FC<WhatsAppIntakeHubProps> = ({
       </div>
 
       {/* Bento Stats Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
-          <div className="text-slate-400 text-xs font-bold uppercase tracking-wider">AWAITING AI TRIAGE</div>
-          <div className="text-3xl font-extrabold text-amber-600 mt-1">{unprocessedSessions.length}</div>
-          <div className="text-[11px] text-slate-500 mt-1 font-medium">Pending 15m buffer or dispatch</div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-sm">
+          <div className="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider">AWAITING AI TRIAGE</div>
+          <div className="text-2xl sm:text-3xl font-extrabold text-amber-600 mt-1">{unprocessedSessions.length}</div>
+          <div className="text-[10px] sm:text-[11px] text-slate-500 mt-1 font-medium">Pending 15m buffer or dispatch</div>
         </div>
 
-        <div className="bg-emerald-600 text-white rounded-3xl p-5 shadow-sm flex flex-col justify-between">
+        <div className="bg-emerald-600 text-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="text-emerald-200 text-xs font-bold uppercase tracking-wider">DISPATCHED TO ODOO</div>
-            <div className="text-3xl font-extrabold mt-1">{dispatchedSessions.length}</div>
+            <div className="text-emerald-200 text-[10px] sm:text-xs font-bold uppercase tracking-wider">DISPATCHED TO ODOO</div>
+            <div className="text-2xl sm:text-3xl font-extrabold mt-1">{dispatchedSessions.length}</div>
           </div>
-          <div className="text-[11px] text-emerald-100 mt-1 font-medium">Aggregated tickets created in Odoo</div>
+          <div className="text-[10px] sm:text-[11px] text-emerald-100 mt-1 font-medium">Aggregated tickets created in Odoo</div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
-          <div className="text-slate-400 text-xs font-bold uppercase tracking-wider">TOTAL INGESTED SESSIONS</div>
-          <div className="text-3xl font-extrabold text-slate-900 mt-1">{sessions.length}</div>
-          <div className="text-[11px] text-slate-500 mt-1 font-medium">Helpline passenger conversations</div>
+        <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-sm">
+          <div className="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider">TOTAL INGESTED SESSIONS</div>
+          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{sessions.length}</div>
+          <div className="text-[10px] sm:text-[11px] text-slate-500 mt-1 font-medium">Helpline passenger conversations</div>
         </div>
 
-        <div className="bg-indigo-600 text-white rounded-3xl p-5 shadow-sm flex flex-col justify-between">
+        <div className="bg-indigo-600 text-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="text-indigo-200 text-xs font-bold uppercase tracking-wider">15-MIN BUFFER RATE</div>
-            <div className="text-3xl font-extrabold mt-1">100%</div>
+            <div className="text-indigo-200 text-[10px] sm:text-xs font-bold uppercase tracking-wider">15-MIN BUFFER RATE</div>
+            <div className="text-2xl sm:text-3xl font-extrabold mt-1">100%</div>
           </div>
-          <div className="text-[11px] text-indigo-100 mt-1 font-medium">Zero duplicate sentence tickets</div>
+          <div className="text-[10px] sm:text-[11px] text-indigo-100 mt-1 font-medium">Zero duplicate sentence tickets</div>
         </div>
       </div>
 
       {/* WhatsApp Sub-Tab Switcher */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm overflow-hidden">
         <div className="pb-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <button

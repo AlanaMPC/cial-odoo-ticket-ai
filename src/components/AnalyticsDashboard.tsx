@@ -37,19 +37,19 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ tickets 
   });
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto pb-12">
+    <div className="space-y-6 w-full max-w-full pb-12">
       
       {/* Header */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-2">
+      <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm space-y-2">
         <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center shadow-2xs">
-            <BarChart3 className="w-5 h-5 text-blue-600" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center shadow-2xs shrink-0">
+            <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
           </div>
           <div>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+            <h2 className="text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight">
               CIAL Airport Incident &amp; Operations Analytics
             </h2>
-            <p className="text-slate-600 text-sm font-medium">
+            <p className="text-slate-600 text-xs sm:text-sm font-medium">
               Real-time metrics demonstrating automated email-to-ticket triage throughput, terminal complaint density, and SLA performance.
             </p>
           </div>
@@ -57,52 +57,52 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ tickets 
       </div>
 
       {/* Top 4 Bento Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-1">
-          <div className="text-slate-400 text-xs font-bold uppercase tracking-wider flex items-center justify-between">
+        <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-sm space-y-1">
+          <div className="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider flex items-center justify-between">
             <span>TOTAL EMAILS TRIAGED</span>
             <Plane className="w-4 h-4 text-blue-600" />
           </div>
-          <div className="text-3xl font-extrabold text-slate-900">{total}</div>
-          <div className="text-[11px] text-blue-600 flex items-center gap-1 mt-1 font-bold">
+          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">{total}</div>
+          <div className="text-[10px] sm:text-[11px] text-blue-600 flex items-center gap-1 mt-1 font-bold">
             <Zap className="w-3 h-3" />
             <span>100% Automated by AI</span>
           </div>
         </div>
 
-        <div className="bg-blue-600 text-white rounded-3xl p-5 shadow-sm space-y-1 flex flex-col justify-between">
-          <div className="text-blue-200 text-xs font-bold uppercase tracking-wider flex items-center justify-between">
+        <div className="bg-blue-600 text-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-sm space-y-1 flex flex-col justify-between">
+          <div className="text-blue-200 text-[10px] sm:text-xs font-bold uppercase tracking-wider flex items-center justify-between">
             <span>AVERAGE TRIAGE TIME</span>
             <Timer className="w-4 h-4 text-blue-200" />
           </div>
           <div>
-            <div className="text-3xl font-extrabold text-white">&lt; 1 Second</div>
-            <div className="text-[11px] text-blue-100 mt-1 font-medium">
+            <div className="text-2xl sm:text-3xl font-extrabold text-white">&lt; 1 Second</div>
+            <div className="text-[10px] sm:text-[11px] text-blue-100 mt-1 font-medium">
               vs. 35-50 mins manual staff reading
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-1">
-          <div className="text-slate-400 text-xs font-bold uppercase tracking-wider flex items-center justify-between">
+        <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-sm space-y-1">
+          <div className="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider flex items-center justify-between">
             <span>CRITICAL P1 DISPATCHES</span>
             <AlertTriangle className="w-4 h-4 text-rose-600" />
           </div>
-          <div className="text-3xl font-extrabold text-rose-600">{p1Count}</div>
-          <div className="text-[11px] text-slate-500 mt-1 font-medium">
+          <div className="text-2xl sm:text-3xl font-extrabold text-rose-600">{p1Count}</div>
+          <div className="text-[10px] sm:text-[11px] text-slate-500 mt-1 font-medium">
             Immediate 15m Ground SLA
           </div>
         </div>
 
-        <div className="bg-indigo-600 text-white rounded-3xl p-5 shadow-sm space-y-1 flex flex-col justify-between">
-          <div className="text-indigo-200 text-xs font-bold uppercase tracking-wider flex items-center justify-between">
+        <div className="bg-indigo-600 text-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-sm space-y-1 flex flex-col justify-between">
+          <div className="text-indigo-200 text-[10px] sm:text-xs font-bold uppercase tracking-wider flex items-center justify-between">
             <span>PASSENGER AUTO-REPLY</span>
             <CheckCircle2 className="w-4 h-4 text-indigo-200" />
           </div>
           <div>
-            <div className="text-3xl font-extrabold text-white">100%</div>
-            <div className="text-[11px] text-indigo-100 mt-1 font-medium">
+            <div className="text-2xl sm:text-3xl font-extrabold text-white">100%</div>
+            <div className="text-[10px] sm:text-[11px] text-indigo-100 mt-1 font-medium">
               Instant Kerala Hospitality SLA
             </div>
           </div>
