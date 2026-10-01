@@ -237,14 +237,21 @@ function loadMailboxState(): InboundMailRecord[] {
     if (fs.existsSync(MAILBOX_FILE)) {
       const raw = fs.readFileSync(MAILBOX_FILE, 'utf-8');
       const data = JSON.parse(raw);
-      if (Array.isArray(data)) {
+      if (Array.isArray(data) && data.length > 0) {
         return data;
       }
     }
   } catch (err) {
     console.warn('[Mailbox Store] Error reading mailbox-state.json:', err);
   }
-  return [];
+  // Automatically reseed with default CIAL mock emails if file was removed or empty
+  const seed = [...INITIAL_MOCK_EMAILS];
+  try {
+    fs.writeFileSync(MAILBOX_FILE, JSON.stringify(seed, null, 2));
+  } catch (err) {
+    console.warn('[Mailbox Store] Error creating initial mailbox-state.json:', err);
+  }
+  return seed;
 }
 
 let inboundMailbox: InboundMailRecord[] = loadMailboxState();
@@ -1829,6 +1836,9 @@ function loadOdooConfig() {
     if (fs.existsSync(ODOO_CONFIG_FILE)) {
       return { ...DEFAULT_ODOO_CONFIG, ...JSON.parse(fs.readFileSync(ODOO_CONFIG_FILE, 'utf-8')) };
     }
+  } catch {}
+  try {
+    fs.writeFileSync(ODOO_CONFIG_FILE, JSON.stringify(DEFAULT_ODOO_CONFIG, null, 2));
   } catch {}
   return DEFAULT_ODOO_CONFIG;
 }

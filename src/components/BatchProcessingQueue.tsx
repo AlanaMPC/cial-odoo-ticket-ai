@@ -105,24 +105,31 @@ export const BatchProcessingQueue: React.FC<BatchProcessingQueueProps> = ({
   }, []);
 
   // Fetch emails from backend API
-  const fetchMailbox = async () => {
+  const fetchMailbox = async (isInitial = false) => {
     try {
-      setLoading(true);
+      if (isInitial) {
+        setLoading(true);
+      }
       const res = await fetch('/api/inbox/emails');
+      if (!res.ok) {
+        return;
+      }
       const data = await res.json();
-      if (data.success && Array.isArray(data.emails)) {
+      if (data && data.success && Array.isArray(data.emails)) {
         setEmails(data.emails);
       }
-    } catch (err) {
-      console.error('Failed to load mailbox from API:', err);
+    } catch {
+      // Gracefully silent on transient fetch drops or server restarts
     } finally {
-      setLoading(false);
+      if (isInitial) {
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
-    fetchMailbox();
-    const interval = setInterval(fetchMailbox, 4000);
+    fetchMailbox(true);
+    const interval = setInterval(() => fetchMailbox(false), 4000);
 
     const handleMailboxUpdated = (e: any) => {
       const deletedId = e.detail?.deletedId;

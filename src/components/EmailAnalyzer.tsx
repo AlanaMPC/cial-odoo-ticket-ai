@@ -74,11 +74,15 @@ export const EmailAnalyzer: React.FC<EmailAnalyzerProps> = ({
   const fetchInboundEmails = async () => {
     try {
       const res = await fetch('/api/inbox/all-inbound');
-      const data = await res.json();
-      if (data.success && Array.isArray(data.items)) {
-        setInboundEmails(data.items);
-      } else {
-        const fallbackRes = await fetch('/api/inbox/emails');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.items)) {
+          setInboundEmails(data.items);
+          return;
+        }
+      }
+      const fallbackRes = await fetch('/api/inbox/emails');
+      if (fallbackRes.ok) {
         const fallbackData = await fallbackRes.json();
         if (fallbackData.success && Array.isArray(fallbackData.emails)) {
           setInboundEmails(fallbackData.emails);
