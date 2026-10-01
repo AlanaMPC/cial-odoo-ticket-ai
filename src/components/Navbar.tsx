@@ -3,8 +3,6 @@ import {
   Plane,
   Cpu,
   LayoutDashboard,
-  FileCode2,
-  BookOpen,
   BarChart3,
   Sparkles,
   Inbox,
@@ -51,8 +49,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'whatsapp_intake', label: 'WhatsApp Helpline (15m Buffer)', icon: MessageSquare, badge: 'New' },
     { id: 'odoo_board', label: 'Odoo Helpdesk Board', icon: LayoutDashboard, badge: ticketCount },
     { id: 'analytics', label: 'Airport Ops Analytics', icon: BarChart3, badge: null },
-    { id: 'api_code', label: 'Odoo API & Python Bridge', icon: FileCode2, badge: null },
-    { id: 'architecture_roadmap', label: 'Architecture & Project Plan', icon: BookOpen, badge: 'BTech Guide' },
   ];
 
   return (
