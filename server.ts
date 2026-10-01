@@ -1364,13 +1364,35 @@ app.post('/api/inbox/emails/:id/mark-filtered', (req: Request, res: Response) =>
   });
 });
 
-// Delete / Dismiss email from inbox (Persistent blacklist + Mark \Seen in Gmail)
+// Delete / Dismiss email or WhatsApp item from inbox (Persistent blacklist + Mark \Seen in Gmail + WhatsApp cleanup)
 app.delete('/api/inbox/emails/:id', (req: Request, res: Response) => {
   const { id } = req.params;
   const decodedId = decodeURIComponent(id);
-  const { subject, senderEmail } = req.body || {};
+  const { subject, senderEmail, senderPhone } = req.body || {};
 
-  // 1. Locate email to extract all identification markers
+  // 1. WhatsApp deletion check: Also check and delete if this is a WhatsApp session
+  const rawWaId = id.replace(/^wa-/, '');
+  const decodedWaId = decodedId.replace(/^wa-/, '');
+  try {
+    let sessions = loadWhatsAppSessions();
+    const initialSessionCount = sessions.length;
+    sessions = sessions.filter((s) => {
+      if (s.id === id || s.id === decodedId || s.id === rawWaId || s.id === decodedWaId) return false;
+      if (`wa-${s.id}` === id || `wa-${s.id}` === decodedId) return false;
+      if (senderPhone && s.passengerPhone && s.passengerPhone.replace(/[^0-9]/g, '') === senderPhone.replace(/[^0-9]/g, '')) {
+        return false;
+      }
+      return true;
+    });
+    if (sessions.length !== initialSessionCount) {
+      saveWhatsAppSessions(sessions);
+      console.log(`[DELETE] Deleted WhatsApp session matching ${id}`);
+    }
+  } catch (err) {
+    console.error('Error removing from WhatsApp sessions:', err);
+  }
+
+  // 2. Locate email in inboundMailbox to extract all identification markers
   let targetEmail = inboundMailbox.find((m) => m.id === id || m.id === decodedId);
   if (!targetEmail && subject && senderEmail) {
     const targetFp = cleanFingerprint(subject, senderEmail);
@@ -1396,21 +1418,21 @@ app.delete('/api/inbox/emails/:id', (req: Request, res: Response) => {
     ignoredEmailIds.add(decodedId);
   }
 
-  // 2. Also record any subject/senderEmail supplied in the request body
+  // 3. Also record any subject/senderEmail supplied in the request body
   if (subject && senderEmail) {
     ignoredEmailFingerprints.add(cleanFingerprint(subject, senderEmail));
   }
 
-  // 3. Persist to disk so blacklist survives server restarts
+  // 4. Persist to disk so blacklist survives server restarts
   saveIgnoredData();
 
-  // 4. Remove from active mailbox and persist
+  // 5. Remove from active mailbox and persist
   inboundMailbox = inboundMailbox.filter(
     (m) => m.id !== id && m.id !== decodedId && !(targetEmail && m.id === targetEmail.id)
   );
   saveMailboxState();
 
-  // 5. OPTION A: Mark as \Seen in Gmail so IMAP search({ seen: false }) skips it
+  // 6. OPTION A: Mark as \Seen in Gmail so IMAP search({ seen: false }) skips it
   if (targetEmail) {
     markEmailAsSeenInImap(targetEmail.imapUid, targetEmail.messageId, targetEmail.subject, targetEmail.sender?.email).catch(() => {});
   }
@@ -1419,7 +1441,7 @@ app.delete('/api/inbox/emails/:id', (req: Request, res: Response) => {
     success: true,
     deleted: true,
     remainingCount: inboundMailbox.length,
-    message: 'Email permanently deleted, blacklisted, and marked as Read on mail server.',
+    message: 'Item permanently deleted and removed from active stream.',
   });
 });
 
@@ -2677,8 +2699,19 @@ app.post('/api/whatsapp/auto-triage-all', async (req: Request, res: Response) =>
 app.delete('/api/whatsapp/sessions/:id', (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const decodedId = decodeURIComponent(id);
+    const rawId = id.replace(/^wa-/, '');
+    const decodedRawId = decodedId.replace(/^wa-/, '');
+
     let sessions = loadWhatsAppSessions();
-    sessions = sessions.filter((s) => s.id !== id);
+    sessions = sessions.filter((s) => 
+      s.id !== id && 
+      s.id !== decodedId && 
+      s.id !== rawId && 
+      s.id !== decodedRawId && 
+      `wa-${s.id}` !== id && 
+      `wa-${s.id}` !== decodedId
+    );
     saveWhatsAppSessions(sessions);
     res.json({ success: true, message: 'WhatsApp session deleted.' });
   } catch (err: any) {

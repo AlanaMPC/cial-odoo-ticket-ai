@@ -99,8 +99,16 @@ export const EmailAnalyzer: React.FC<EmailAnalyzerProps> = ({
 
     const handleMailboxUpdated = (e: any) => {
       const deletedId = e.detail?.deletedId;
-      if (deletedId) {
-        setInboundEmails((prev) => prev.filter((m) => m.id !== deletedId));
+      const waId = e.detail?.whatsappId;
+      if (deletedId || waId) {
+        setInboundEmails((prev) =>
+          prev.filter(
+            (m) =>
+              m.id !== deletedId &&
+              m.id !== `wa-${deletedId}` &&
+              (!waId || (m.id !== waId && m.id !== `wa-${waId}` && m.whatsappSessionId !== waId))
+          )
+        );
       }
       fetchInboundEmails();
     };
@@ -216,22 +224,52 @@ export const EmailAnalyzer: React.FC<EmailAnalyzerProps> = ({
       : inboundEmails.find((e) => e.subject === subject && (e.sender?.email === senderEmail || e.sender?.name === senderName));
     const emailId = emailToDelete?.id || selectedInboundEmailId || (initialEmail ? initialEmail.id : '');
 
+    const isWhatsApp =
+      emailToDelete?.sourceChannel === 'WHATSAPP' ||
+      emailId.startsWith('wa-') ||
+      Boolean(emailToDelete?.whatsappSessionId) ||
+      subject?.toLowerCase().includes('[whatsapp]');
+    const waSessionId = emailToDelete?.whatsappSessionId || emailId.replace(/^wa-/, '');
+
     setIsDeletingEmail(true);
     try {
       if (emailId) {
+        // If it's a WhatsApp session, delete from dedicated WhatsApp session endpoint first
+        if (isWhatsApp && waSessionId) {
+          try {
+            await fetch(`/api/whatsapp/sessions/${encodeURIComponent(waSessionId)}`, {
+              method: 'DELETE',
+            });
+          } catch (waErr) {
+            console.error('Error deleting WhatsApp session directly:', waErr);
+          }
+        }
+
+        // Also call the unified inbox deletion endpoint
         await fetch(`/api/inbox/emails/${encodeURIComponent(emailId)}`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             subject: emailToDelete?.subject || subject,
             senderEmail: emailToDelete?.sender?.email || senderEmail,
+            senderPhone: emailToDelete?.sender?.phone || senderPhone,
           }),
         });
+
         // Notify all views (Hub tab, Dispatcher stream, Navbar counter) immediately
-        window.dispatchEvent(new CustomEvent('cial-mailbox-updated', { detail: { deletedId: emailId } }));
+        window.dispatchEvent(
+          new CustomEvent('cial-mailbox-updated', {
+            detail: { deletedId: emailId, whatsappId: waSessionId },
+          })
+        );
       }
 
-      const remaining = inboundEmails.filter((e) => e.id !== emailId);
+      const remaining = inboundEmails.filter(
+        (e) =>
+          e.id !== emailId &&
+          e.id !== `wa-${waSessionId}` &&
+          (!waSessionId || e.whatsappSessionId !== waSessionId)
+      );
       setInboundEmails(remaining);
       await fetchInboundEmails();
 
@@ -251,7 +289,7 @@ export const EmailAnalyzer: React.FC<EmailAnalyzerProps> = ({
         onSelectEmail?.(null as any);
       }
     } catch (err) {
-      console.error('Error deleting non-airport email:', err);
+      console.error('Error deleting non-airport item:', err);
     } finally {
       setIsDeletingEmail(false);
     }
@@ -434,6 +472,11 @@ export const EmailAnalyzer: React.FC<EmailAnalyzerProps> = ({
         return 'bg-slate-50 text-slate-700 border-slate-200';
     }
   };
+
+  const isCurrentItemWhatsApp =
+    selectedInboundEmailId?.startsWith('wa-') ||
+    subject?.toLowerCase().includes('[whatsapp]') ||
+    inboundEmails.find((e) => e.id === selectedInboundEmailId)?.sourceChannel === 'WHATSAPP';
 
   return (
     <div className="space-y-6">
@@ -905,7 +948,9 @@ export const EmailAnalyzer: React.FC<EmailAnalyzerProps> = ({
                   <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-100/60 p-3 rounded-xl border border-amber-300/80">
                     <div className="text-xs text-amber-950">
                       <span className="font-bold">Remove from intake stream:</span>
-                      <p className="text-[11px] text-amber-800">Permanently deletes this non-airport email from both the AI Dispatcher and Inbound Mailbox Hub.</p>
+                      <p className="text-[11px] text-amber-800">
+                        Permanently deletes this non-airport {isCurrentItemWhatsApp ? 'WhatsApp message' : 'email'} from both the AI Dispatcher and Inbound Hub.
+                      </p>
                     </div>
                     <button
                       id="delete-non-airport-email-top-btn"
@@ -914,7 +959,13 @@ export const EmailAnalyzer: React.FC<EmailAnalyzerProps> = ({
                       className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 transition cursor-pointer shrink-0 disabled:opacity-50"
                     >
                       <Trash2 className="w-4 h-4" />
-                      <span>{isDeletingEmail ? 'Deleting Email...' : 'Delete Non-Airport Email'}</span>
+                      <span>
+                        {isDeletingEmail
+                          ? 'Deleting...'
+                          : isCurrentItemWhatsApp
+                          ? 'Delete Non-Airport WhatsApp Message'
+                          : 'Delete Non-Airport Email'}
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -1158,7 +1209,7 @@ export const EmailAnalyzer: React.FC<EmailAnalyzerProps> = ({
                     </div>
                   </div>
 
-                  {/* Delete Non-Airport Email Button */}
+                  {/* Delete Non-Airport Item Button */}
                   <button
                     id="delete-non-airport-email-btn"
                     onClick={handleDeleteNonAirportEmail}
@@ -1167,7 +1218,11 @@ export const EmailAnalyzer: React.FC<EmailAnalyzerProps> = ({
                   >
                     <Trash2 className="w-4 h-4" />
                     <span>
-                      {isDeletingEmail ? 'Deleting Email from Mailbox...' : 'Delete Email from Inbound Mailbox'}
+                      {isDeletingEmail
+                        ? 'Deleting from Intake...'
+                        : isCurrentItemWhatsApp
+                        ? 'Delete WhatsApp Message from Intake'
+                        : 'Delete Email from Inbound Mailbox'}
                     </span>
                   </button>
 

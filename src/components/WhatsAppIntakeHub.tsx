@@ -171,7 +171,11 @@ export const WhatsAppIntakeHub: React.FC<WhatsAppIntakeHubProps> = ({
           method: 'DELETE',
         });
         setSessions((prev) => prev.filter((s) => s.id !== sessionId));
-        window.dispatchEvent(new CustomEvent('cial-mailbox-updated'));
+        window.dispatchEvent(
+          new CustomEvent('cial-mailbox-updated', {
+            detail: { deletedId: `wa-${sessionId}`, whatsappId: sessionId },
+          })
+        );
       } catch (err) {
         console.error('Error deleting session:', err);
       }
